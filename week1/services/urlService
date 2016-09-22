@@ -25,12 +25,11 @@ var getLongUrl = function(shortUrl) {
 
 // generate a new shortUrl
 var generateShortUrl = function () {
-    console.log('generating #' + Object.keys(longToShortHash).length + ' shortUrl');
-    return ConvertTo62(Object.keys(longToShortHash).length);
+    return convertTo62(Object.keys(longToShortHash).length);
 };
 
 // convert number from 10-base to 62-base (inverted order) string
-function ConvertTo62(number) {
+function convertTo62(number) {
     // encode =['a',...,'z','A',...,'Z','0',...,'9'
     var encode = getSeq('a','z').concat(getSeq('A','Z'), getSeq('0','9'));
     res = "";
