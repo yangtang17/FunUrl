@@ -33,10 +33,10 @@ function convertTo62(number) {
     // encode =['a',...,'z','A',...,'Z','0',...,'9'
     var encode = getSeq('a','z').concat(getSeq('A','Z'), getSeq('0','9'));
     res = "";
-    while(number != 0 || res === "") { // need 2nd condition to ensure not to skip 0 input
+    do { // need 2nd condition to ensure not to skip 0 input
         res += encode[number % 62];
         number = Math.floor(number / 62);
-    }
+    } while (number)
     return res;
 }
 
