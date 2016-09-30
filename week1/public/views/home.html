@@ -1,11 +1,11 @@
 <div class="row">
     <div class="col-md-6 col-md-offset-3">
         <h4>Input your looooooooooooooooooooooog URL;</h4>
-        <form>
+        <form ng-submit="submit()">
             <div class="form-group">
-                <input type="text"/>
+                <input type="text" class="form-control" ng-model="longUrl"/>
             </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="submit" class="btn btn-primary">Get Your TinyURL</button>
         </form>
     </div>
 </div>
