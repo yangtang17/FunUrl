@@ -9,7 +9,8 @@ router.get('*', function(req, res) {
     if (longUrl) {
         res.redirect(longUrl);
     } else {
-        res.sendFile("404.html", {root: path.join(__dirname, '../public/views/')});
+        //res.sendFile("404.html", {root: path.join(__dirname, '../public/views/')});
+        res.redirect('../');
     }
 });
 

@@ -5,13 +5,12 @@ var app = angular.module('tinyurlApp', ['ngResource', 'ngRoute'])
             templateUrl: '/public/views/home.html',
             controller: 'homeController'
         })
-//        .when('/:shortUrl', {
-//            templateUrl: '/public/views/url.html',
-//            controller: 'redirectController'
-//        })
         .when('/urls/:shortUrl', {
             templateUrl: '/public/views/url.html',
             controller: 'urlController'
+        })
+        .otherwise({
+            redirectTo: '/'
         });
 })
 .config(function($locationProvider) {
