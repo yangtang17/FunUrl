@@ -3,7 +3,9 @@ var app = express();
 var restRouter = require('./routes/rest');
 var redirectRouter = require('./routes/redirect');
 var indexRouter = require('./routes/index');
+var mongoose = require('mongoose');
 
+mongoose.connect('mongodb://user:user@ds051523.mlab.com:51523/xsurl');
 
 app.use('/public', express.static(__dirname + '/public'));
 

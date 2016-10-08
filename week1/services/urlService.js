@@ -1,31 +1,47 @@
-var longToShortHash = {};
-var shortToLongHash = {};
+var UrlModel = require('../models/urlModel');
 
+
+
+// ======================= Main logic ==========================================
 // get shortUrl from given longUrl
-var getShortUrl = function(longUrl) {
+var getShortUrl = function(longUrl, callback) {
     // handle url without 'http://'
     if (longUrl.indexOf('http') === -1) {
         longUrl = 'http://' + longUrl;
     }
 
-    if(longToShortHash[longUrl] != null) {
-        return longToShortHash[longUrl];
-    } else {
-        var shortUrl = generateShortUrl();
-        longToShortHash[longUrl] = shortUrl;
-        shortToLongHash[shortUrl] = longUrl;
-        return shortUrl;
-    }
+    UrlModel.findOne({longUrl: longUrl}, function(err, url) {
+        if (url) {
+            callback(url);
+        } else {
+            generateShortUrl(longUrl, function(shortUrl) {
+                url = new UrlModel({
+                    shortUrl: shortUrl,
+                    longUrl: longUrl
+                });
+                url.save();
+                callback(url);
+            });
+        }
+    });
 };
 
 // get longUrl from given shortUrl
-var getLongUrl = function(shortUrl) {
-    return shortToLongHash[shortUrl];
+var getLongUrl = function(shortUrl, callback) {
+    UrlModel.findOne({shortUrl: shortUrl}, function(err, url) {
+        callback(url);
+    });
 };
 
-// generate a new shortUrl
-var generateShortUrl = function () {
-    return convertTo62(Object.keys(longToShortHash).length);
+
+
+//===================================== Helpers =================================
+
+// generate a new shortUrl for given longUrl
+var generateShortUrl = function (longUrl, callback) {
+    UrlModel.count({}, function(err, num) {
+        callback(convertTo62(num));
+    });
 };
 
 // convert number from 10-base to 62-base (inverted order) string
@@ -48,7 +64,7 @@ function getSeq(a, b) {
     }).join("");
 }
 
-
+// =========================== Output ==========================================
 module.exports = {
     getShortUrl: getShortUrl,
     getLongUrl: getLongUrl
