@@ -4,6 +4,7 @@ var bodyParser = require('body-parser');
 var jsonParser = bodyParser.json();
 var urlService = require('../services/urlService');
 
+// post a new longUrl
 router.post('/urls', jsonParser, function(req, res) {
     var longUrl = req.body.longUrl;
     urlService.getShortUrl(longUrl, function(url) {
@@ -11,6 +12,7 @@ router.post('/urls', jsonParser, function(req, res) {
     });
 });
 
+// lookup a shortUrl without redirecting
 router.get('/urls/:shortUrl', function(req, res) {
     var shortUrl = req.params.shortUrl;
     urlService.getLongUrl(shortUrl, function(url) {
