@@ -15,5 +15,4 @@ app.use("/", indexRouter);
 
 app.use("/:shortUrl", redirectRouter);
 
-app.listen(8000);
-
+app.listen(3000);
