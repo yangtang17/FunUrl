@@ -37,26 +37,31 @@ var getShortUrl = function(longUrl, callback) {
     }
 
     redisClient.get(longUrl, function(err, shortUrl) {
-        if (shortUrl) {
-            console.log('redisClient: return getShortUrl from redis!');
+        if (shortUrl) { // found shortUrl in redis
             callback({
                 shortUrl: shortUrl,
                 longUrl: longUrl
             });
-        } else {
+        } else { // if not, check mongodb
             UrlModel.findOne({ longUrl: longUrl }, function(err, url) {
-                if (url) {
+                if (url) { // found in mongodb, callback and save to redis
                     callback(url);
                     redisClient.set(url.shortUrl, url.longUrl);
                     redisClient.set(url.longUrl, url.shortUrl);
-                } else {
+                } else { // not found, generate new shortUrl
                     generateShortUrl(function(shortUrl) {
                         url = new UrlModel({
                             shortUrl: shortUrl,
                             longUrl: longUrl
                         });
+
+                        // save to mongodb
                         url.save();
+
+                        // callback
                         callback(url);
+
+                        // save to redis
                         redisClient.set(url.shortUrl, url.longUrl);
                         redisClient.set(url.longUrl, url.shortUrl);
                     });
@@ -70,14 +75,17 @@ var getShortUrl = function(longUrl, callback) {
 // get longUrl from given shortUrl
 var getLongUrl = function(shortUrl, callback) {
     redisClient.get(shortUrl, function(err, longUrl) {
-        if (longUrl) {
+        if (longUrl) { // found in redis
             callback({
                 shortUrl: shortUrl,
                 longUrl: longUrl
             });
-        } else {
+        } else { // not found, check mongodb
             UrlModel.findOne({ shortUrl: shortUrl }, function(err, url) {
+                // callback even if url is null, so callback knows not found
                 callback(url);
+
+                // only save to redis when url is not null
                 if (url) {
                     redisClient.set(url.shortUrl, url.longUrl);
                     redisClient.set(url.longUrl, url.shortUrl);
