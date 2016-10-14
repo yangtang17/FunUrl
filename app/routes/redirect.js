@@ -15,11 +15,8 @@ router.get('*', function(req, res) {
             res.redirect(url.longUrl);
             statsService.logRequest(shortUrl, req);
         } else {
-            //res.sendFile("404.html", {root: path.join(__dirname, '../public/views/')});
-
-            // redirect to home page, to handle directl visit random url under
-            // server domain from browser
-            res.redirect('../');
+            // if not found, return index page, let client side handle further // routing
+            res.sendFile("index.html", { root: path.join(__dirname, '../public/views/') });
         }
     });
 });
