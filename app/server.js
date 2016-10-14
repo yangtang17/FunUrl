@@ -4,10 +4,15 @@ var restRouter = require('./routes/rest');
 var redirectRouter = require('./routes/redirect');
 var indexRouter = require('./routes/index');
 var mongoose = require('mongoose');
+var useragent = require('express-useragent');
 
 mongoose.connect('mongodb://user:user@ds051523.mlab.com:51523/xsurl');
 
 app.use('/public', express.static(__dirname + '/public'));
+
+// pre-process all requests with express-useragent middleware, except for those
+// requesting documents from '/public' path
+app.use(useragent.express());
 
 app.use("/api/v1", restRouter);
 
