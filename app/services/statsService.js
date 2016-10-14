@@ -41,6 +41,28 @@ var getUrlInfo = function(shortUrl, info, callback) {
         });
         return;
     }
+
+    RequestModel.aggregate([{
+        $match: {
+            shortUrl: shortUrl
+        }
+    }, {
+        $sort: {
+            timestamp: -1
+        }
+    }, {
+        $group: {
+            _id: "$referer",
+            count: {
+                $sum: 1
+            }
+        }
+    }], function(err, data) {
+        callback(data);
+    });
+
+
+
 };
 
 module.exports = {

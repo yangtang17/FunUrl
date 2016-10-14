@@ -12,4 +12,20 @@ angular.module('tinyurlApp')
             .success(function(data) {
                 $scope.totalClicks = data;
             });
+
+
+        var renderChart = function(chart, infos) {
+            $scope[chart + 'Labels'] = [];
+            $scope[chart + 'Data'] = [];
+
+            $http.get('/api/v1/urls/' + $routeParams.shortUrl + '/' + infos)
+                .success(function(data) {
+                    data.forEach(function(info) {
+                        $scope[chart + 'Labels'].push(info._id);
+                        $scope[chart + 'Data'].push(info.count);
+                    });
+                });
+        };
+
+        renderChart("doughnut", "referers");
     }]);
