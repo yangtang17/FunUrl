@@ -42,11 +42,41 @@ var getUrlInfo = function(shortUrl, info, callback) {
         return;
     }
 
-    var groupId = '$' + info;
+    var groupId = '';
+    var timeLimit = new Date().getTime(); // only show data after this time
+    if (info === 'hour') {
+        groupId = {
+            year: { $year: "$timestamp" },
+            month: { $month: "$timestamp" },
+            day: { $dayOfMonth: "$timestamp" },
+            hour: { $hour: "$timestamp" },
+            minutes: { $minute: "$timestamp" }
+        };
+        timeLimit -= 60 * 60 * 1000; // past hour
+    } else if (info === 'day') {
+        groupId = {
+            year: { $year: "$timestamp" },
+            month: { $month: "$timestamp" },
+            day: { $dayOfMonth: "$timestamp" },
+            hour: { $hour: "$timestamp" }
+        };
+        timeLimit -= 24 * 60 * 60 * 1000; // past day
+    } else if (info === 'month') {
+        groupId = {
+            year: { $year: "$timestamp" },
+            month: { $month: "$timestamp" },
+            day: { $dayOfMonth: "$timestamp" }
+        };
+        timeLimit -= 30 * 24 * 60 * 60 * 1000; // past month
+    } else {
+        groupId = '$' + info;
+        timeLimit = 0; // after 1970...
+    }
 
     RequestModel.aggregate([{
         $match: {
-            shortUrl: shortUrl
+            shortUrl: shortUrl,
+            timestamp: { $gt: new Date(timeLimit) }
         }
     }, {
         $sort: {
@@ -60,6 +90,8 @@ var getUrlInfo = function(shortUrl, info, callback) {
             }
         }
     }], function(err, data) {
+
+
         callback(data);
     });
 

@@ -31,4 +31,43 @@ angular.module('tinyurlApp')
         renderChart("pie", "country");
         renderChart("base", "platform");
         renderChart("bar", "browser");
+
+        // variables to pass string in getTime(time) from HTML
+        $scope.hour = 'hour';
+        $scope.day = 'day';
+        $scope.year = 'year';
+
+        // has three values: 'hour', 'day', 'year'
+        $scope.time = $scope.hour;
+
+        $scope.getTime = function(time) {
+            $scope.lineLabels = [];
+            $scope.lineData = [];
+
+            $scope.time = time;
+
+            $http.get('/api/v1/urls/' + $routeParams.shortUrl + '/' + time)
+                .success(function(data) {
+                    data.forEach(function(item) {
+                        var legend = '';
+                        if (time === 'hour') {
+                            if (item._id.minutes < 10) {
+                                item._id.minutes = '0' + item._id.minutes;
+                            }
+                            legend = item._id.hour + ':' + item._id.minutes;
+                        }
+                        if (time === 'day') {
+                            legend = item._id.hour + ':00';
+                        }
+                        if (time === 'month') {
+                            legend = item._id.month + '/' + item._id.day;
+                        }
+                        $scope.lineLabels.push(legend);
+                        $scope.lineData.push(item.count);
+                    });
+                });
+        }
+
+        $scope.getTime($scope.time);
+
     }]);
