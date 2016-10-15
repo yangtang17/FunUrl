@@ -36,7 +36,7 @@ angular.module('tinyurlApp')
             // base chart (platforms) starts y-axis tick from zero
             $scope.baseOptions = {
                 scales: {
-                    yAxes: [{
+                    xAxes: [{
                         ticks: {
                             beginAtZero: true
                         }
