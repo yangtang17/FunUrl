@@ -25,6 +25,24 @@ angular.module('tinyurlApp')
                         $scope[chart + 'Data'].push(info.count);
                     });
                 });
+
+
+            // line chart (clicks) showing series ('Clicks:') when hovering
+            $scope.lineSeries = ['Clicks: '];
+            // line x-axis label skip
+            $scope.lineOptions = {
+                showXLabels: 3
+            };
+            // base chart (platforms) starts y-axis tick from zero
+            $scope.baseOptions = {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                }
+            };
         };
 
         renderChart("doughnut", "referer");
@@ -35,14 +53,16 @@ angular.module('tinyurlApp')
         // variables to pass string in getTime(time) from HTML
         $scope.hour = 'hour';
         $scope.day = 'day';
-        $scope.year = 'year';
+        $scope.month = 'month';
 
         // has three values: 'hour', 'day', 'year'
         $scope.time = $scope.hour;
 
         $scope.getTime = function(time) {
             $scope.lineLabels = [];
+            // ensure lineData is 2D array to display hover effect correctly
             $scope.lineData = [];
+            $scope.lineData.push([]);
 
             $scope.time = time;
 
@@ -54,16 +74,26 @@ angular.module('tinyurlApp')
                             if (item._id.minutes < 10) {
                                 item._id.minutes = '0' + item._id.minutes;
                             }
-                            legend = item._id.hour + ':' + item._id.minutes;
+                            var minuteLabels = ['00', '15', '30', '45'];
+                            if (minuteLabels.includes('' + item._id.minutes)) {
+                                legend = item._id.hour + ':' + item._id.minutes;
+                            }
                         }
                         if (time === 'day') {
-                            legend = item._id.hour + ':00';
+                            var hourLabels = [0, 4, 8, 12, 16, 20];
+                            if (hourLabels.includes(item._id.hour)) {
+                                legend = item._id.hour + ':00';
+                            }
                         }
                         if (time === 'month') {
-                            legend = item._id.month + '/' + item._id.day;
+                            var dayLabels = [1, 8, 15, 22, 29];
+                            if (dayLabels.includes(item._id.day)) {
+                                legend = item._id.month + '/' + item._id.day;
+                            }
+
                         }
                         $scope.lineLabels.push(legend);
-                        $scope.lineData.push(item.count);
+                        $scope.lineData[0].push(item.count);
                     });
                 });
         }

@@ -90,6 +90,55 @@ var getUrlInfo = function(shortUrl, info, callback) {
             }
         }
     }], function(err, data) {
+        // insert 0 points wherever there's no data points
+        var i;
+        var timeSlot;
+        if (info === 'hour') {
+            for (i = 0; i <= 60; i++) {
+                timeSlot = new Date(timeLimit + i * 60 * 1000);
+                if (i >= data.length || data[i]._id.hour !== timeSlot.getHours() || data[i]._id.minutes !== timeSlot.getMinutes()) {
+                    data.splice(i, 0, {
+                        _id: {
+                            year: timeSlot.getFullYear(),
+                            month: timeSlot.getMonth(),
+                            day: timeSlot.getDate(),
+                            hour: timeSlot.getHours(),
+                            minutes: timeSlot.getMinutes()
+                        },
+                        count: 0
+                    });
+                }
+            }
+        } else if (info === 'day') {
+            for (i = 0; i < data.length && i <= 24; i++) {
+                timeSlot = new Date(timeLimit + i * 60 * 60 * 1000);
+                if (data[i]._id.day !== timeSlot.getDate() || data[i]._id.hour !== timeSlot.getHours()) {
+                    data.splice(i, 0, {
+                        _id: {
+                            year: timeSlot.getFullYear(),
+                            month: timeSlot.getMonth(),
+                            day: timeSlot.getDate(),
+                            hour: timeSlot.getHours()
+                        },
+                        count: 0
+                    });
+                }
+            }
+        } else if (info === 'month') {
+            for (i = 0; i < data.length && i <= 30; i++) {
+                timeSlot = new Date(timeLimit + i * 24 * 60 * 60 * 1000);
+                if (data[i]._id.month !== timeSlot.getMonth() || data[i]._id.day !== timeSlot.getDate()) {
+                    data.splice(i, 0, {
+                        _id: {
+                            year: timeSlot.getFullYear(),
+                            month: timeSlot.getMonth(),
+                            day: timeSlot.getDate()
+                        },
+                        count: 0
+                    });
+                }
+            }
+        }
 
 
         callback(data);
