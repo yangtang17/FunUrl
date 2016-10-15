@@ -108,26 +108,40 @@ var getUrlInfo = function(shortUrl, info, callback) {
                         count: 0
                     });
                 }
+                data[i].time = new Date(timeSlot.getTime());
             }
         } else if (info === 'day') {
-            for (i = 0; i < data.length && i <= 24; i++) {
+            // mongoose $sort does not yield right order!!!
+            var newData = [];
+            for (i = 0; i <= 24; i++) {
                 timeSlot = new Date(timeLimit + i * 60 * 60 * 1000);
-                if (data[i]._id.day !== timeSlot.getDate() || data[i]._id.hour !== timeSlot.getHours()) {
-                    data.splice(i, 0, {
-                        _id: {
-                            year: timeSlot.getFullYear(),
-                            month: timeSlot.getMonth(),
-                            day: timeSlot.getDate(),
-                            hour: timeSlot.getHours()
-                        },
-                        count: 0
-                    });
+                newData.push({
+                    _id: {
+                        year: timeSlot.getFullYear(),
+                        month: timeSlot.getMonth(),
+                        day: timeSlot.getDate(),
+                        hour: timeSlot.getHours()
+                    },
+                    count: 0,
+                    time: new Date(timeSlot.getTime())
+                });
+            }
+
+            for (i = 0; i < data.length; i++) {
+                for (var j = 0; j <= 24; j++) {
+                    if (data[i]._id.day === newData[j]._id.day &&
+                        data[i]._id.hour === newData[j]._id.hour) {
+                        newData[j].count = data[i].count;
+                    }
                 }
             }
+
+            data = newData;
+
         } else if (info === 'month') {
-            for (i = 0; i < data.length && i <= 30; i++) {
+            for (i = 0; i <= 30; i++) {
                 timeSlot = new Date(timeLimit + i * 24 * 60 * 60 * 1000);
-                if (data[i]._id.month !== timeSlot.getMonth() || data[i]._id.day !== timeSlot.getDate()) {
+                if (i >= data.length || data[i]._id.month !== timeSlot.getMonth() + 1 || data[i]._id.day !== timeSlot.getDate()) {
                     data.splice(i, 0, {
                         _id: {
                             year: timeSlot.getFullYear(),
@@ -137,9 +151,9 @@ var getUrlInfo = function(shortUrl, info, callback) {
                         count: 0
                     });
                 }
+                data[i].time = new Date(timeSlot.getTime());
             }
         }
-
 
         callback(data);
     });

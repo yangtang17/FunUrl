@@ -27,12 +27,6 @@ angular.module('tinyurlApp')
                 });
 
 
-            // line chart (clicks) showing series ('Clicks:') when hovering
-            $scope.lineSeries = ['Clicks: '];
-            // line x-axis label skip
-            $scope.lineOptions = {
-                showXLabels: 3
-            };
             // base chart (platforms) starts y-axis tick from zero
             $scope.baseOptions = {
                 scales: {
@@ -58,6 +52,50 @@ angular.module('tinyurlApp')
         // has three values: 'hour', 'day', 'year'
         $scope.time = $scope.hour;
 
+        // line chart (clicks) showing series ('Clicks:') when hovering
+        $scope.lineSeries = ['Clicks: '];
+
+        // line options for different x scale
+        var timeOptions = {};
+        timeOptions.hour = {
+            unit: 'minute',
+            unitStepSize: 15,
+            round: 'minute',
+            tooltipFormat: 'h:mm a',
+            displayFormats: {
+                minute: 'h:mm a'
+            }
+        };
+
+        timeOptions.day = {
+            unit: 'hour',
+            unitStepSize: 4,
+            round: 'hour',
+            tooltipFormat: 'MMM D, hA',
+            displayFormats: {
+                hour: 'MMM D, hA'
+            }
+        };
+
+        timeOptions.month = {
+            unit: 'day',
+            unitStepSize: 5,
+            round: 'day',
+            tooltipFormat: 'MMM D, YYYY',
+            displayFormats: {
+                day: 'MMM D, YYYY'
+            }
+        };
+
+        $scope.lineOptions = {
+            scales: {
+                xAxes: [{
+                    type: 'time',
+                    time: timeOptions.hour
+                }]
+            }
+        };
+
         $scope.getTime = function(time) {
             $scope.lineLabels = [];
             // ensure lineData is 2D array to display hover effect correctly
@@ -66,37 +104,20 @@ angular.module('tinyurlApp')
 
             $scope.time = time;
 
+            $scope.lineOptions.scales.xAxes[0].time = timeOptions[time];
+
+
             $http.get('/api/v1/urls/' + $routeParams.shortUrl + '/' + time)
                 .success(function(data) {
                     data.forEach(function(item) {
-                        var legend = '';
-                        if (time === 'hour') {
-                            if (item._id.minutes < 10) {
-                                item._id.minutes = '0' + item._id.minutes;
-                            }
-                            var minuteLabels = ['00', '15', '30', '45'];
-                            if (minuteLabels.includes('' + item._id.minutes)) {
-                                legend = item._id.hour + ':' + item._id.minutes;
-                            }
-                        }
-                        if (time === 'day') {
-                            var hourLabels = [0, 4, 8, 12, 16, 20];
-                            if (hourLabels.includes(item._id.hour)) {
-                                legend = item._id.hour + ':00';
-                            }
-                        }
-                        if (time === 'month') {
-                            var dayLabels = [1, 8, 15, 22, 29];
-                            if (dayLabels.includes(item._id.day)) {
-                                legend = item._id.month + '/' + item._id.day;
-                            }
-
-                        }
-                        $scope.lineLabels.push(legend);
+                        // note: item.time is a string, NOT a Date object
+                        // directly pushing in item.time will cause ERROR!!!
+                        $scope.lineLabels.push(new Date(item.time));
+                        console.log(item.time + ':  ' + item.count);
                         $scope.lineData[0].push(item.count);
                     });
                 });
-        }
+        };
 
         $scope.getTime($scope.time);
 
