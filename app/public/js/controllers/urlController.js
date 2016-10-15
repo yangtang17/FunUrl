@@ -27,5 +27,8 @@ angular.module('tinyurlApp')
                 });
         };
 
-        renderChart("doughnut", "referers");
+        renderChart("doughnut", "referer");
+        renderChart("pie", "country");
+        renderChart("base", "platform");
+        renderChart("bar", "browser");
     }]);

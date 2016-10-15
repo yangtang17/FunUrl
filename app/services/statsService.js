@@ -42,6 +42,8 @@ var getUrlInfo = function(shortUrl, info, callback) {
         return;
     }
 
+    var groupId = '$' + info;
+
     RequestModel.aggregate([{
         $match: {
             shortUrl: shortUrl
@@ -52,7 +54,7 @@ var getUrlInfo = function(shortUrl, info, callback) {
         }
     }, {
         $group: {
-            _id: "$referer",
+            _id: groupId,
             count: {
                 $sum: 1
             }
