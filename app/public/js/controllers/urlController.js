@@ -113,7 +113,7 @@ angular.module('tinyurlApp')
                         // note: item.time is a string, NOT a Date object
                         // directly pushing in item.time will cause ERROR!!!
                         $scope.lineLabels.push(new Date(item.time));
-                        console.log(item.time + ':  ' + item.count);
+                        // console.log(item.time + ':  ' + item.count);
                         $scope.lineData[0].push(item.count);
                     });
                 });

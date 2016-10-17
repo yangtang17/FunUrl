@@ -55,18 +55,21 @@ var getShortUrl = function(longUrl, urlType, callback) {
         longUrl = 'http://' + longUrl;
     }
 
-    redisClient.get(longUrl, function(err, shortUrl) {
-        if (shortUrl) { // found shortUrl in redis
+    // for longUrl, needs to store urlType as well, use 'redisClient.hgetall'
+    redisClient.hgetall(longUrl, function(err, hash) {
+        if (hash && hash.urlType === urlType) { // found shortUrl in redis
+            // console.log('found shortUrl: ' + hash.shortUrl + '; type: ' + hash.urlType);
             callback({
-                shortUrl: shortUrl,
-                longUrl: longUrl
+                shortUrl: hash.shortUrl,
+                longUrl: longUrl,
+                urlType: hash.urlType
             });
         } else { // if not, check mongodb
             UrlModel.findOne({ longUrl: longUrl }, function(err, url) {
                 if (url) { // found in mongodb, callback and save to redis
                     callback(url);
                     redisClient.set(url.shortUrl, url.longUrl);
-                    redisClient.set(url.longUrl, url.shortUrl);
+                    redisClient.hmset(url.longUrl, 'shortUrl', url.shortUrl, 'urlType', url.urlType);
                 } else { // not found, generate new shortUrl
                     generateShortUrl(urlType, function(shortUrl) {
                         url = new UrlModel({
@@ -83,7 +86,7 @@ var getShortUrl = function(longUrl, urlType, callback) {
 
                         // save to redis
                         redisClient.set(url.shortUrl, url.longUrl);
-                        redisClient.set(url.longUrl, url.shortUrl);
+                        redisClient.hmset(url.longUrl, 'shortUrl', url.shortUrl, 'urlType', url.urlType);
                     });
                 }
             });
@@ -108,7 +111,7 @@ var getLongUrl = function(shortUrl, callback) {
                 // only save to redis when url is not null
                 if (url) {
                     redisClient.set(url.shortUrl, url.longUrl);
-                    redisClient.set(url.longUrl, url.shortUrl);
+                    redisClient.hmset(url.longUrl, 'shortUrl', url.shortUrl, 'urlType', url.urlType);
                 }
             });
         }

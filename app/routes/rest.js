@@ -17,7 +17,7 @@ router.post('/urls', jsonParser, function(req, res) {
 // lookup a shortUrl without redirecting
 router.get('/urls/:shortUrl', function(req, res) {
     var shortUrl = req.params.shortUrl;
-    console.log('getting shortUrl: ' + shortUrl);
+    // console.log('getting shortUrl: ' + shortUrl);
     urlService.getLongUrl(shortUrl, function(url) {
         res.json(url);
     });
