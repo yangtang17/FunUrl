@@ -65,7 +65,7 @@ var getShortUrl = function(longUrl, urlType, callback) {
                 urlType: hash.urlType
             });
         } else { // if not, check mongodb
-            UrlModel.findOne({ longUrl: longUrl }, function(err, url) {
+            UrlModel.findOne({ longUrl: longUrl, urlType: urlType }, function(err, url) {
                 if (url) { // found in mongodb, callback and save to redis
                     callback(url);
                     redisClient.set(url.shortUrl, url.longUrl);

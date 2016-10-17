@@ -25,18 +25,28 @@ angular.module('tinyurlApp')
                         $scope[chart + 'Data'].push(info.count);
                     });
                 });
+        };
 
+        // base chart (platforms) starts x-axis tick from zero
+        $scope.baseOptions = {
+            scales: {
+                xAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        };
 
-            // base chart (platforms) starts y-axis tick from zero
-            $scope.baseOptions = {
-                scales: {
-                    xAxes: [{
-                        ticks: {
-                            beginAtZero: true
-                        }
-                    }]
-                }
-            };
+        // bar chart (browsers) starts y-axis tick from zero
+        $scope.barOptions = {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
         };
 
         renderChart("doughnut", "referer");
