@@ -5,7 +5,14 @@
             <div class="form-group">
                 <input type="text" class="form-control" ng-model="longUrl" />
             </div>
-            <button type="submit" class="btn btn-primary">Get Your TinyURL</button>
+            <div class="form-group">
+                <label for="urlType"> Select url type: </label>
+                <select class="form-control" ng-model="urlType">
+                    <option value="alphaNum">Alpha-numerical link</option>
+                    <option value="emoji">Emoji link</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Get Your English TinyURL</button>
         </form>
     </div>
 </div>

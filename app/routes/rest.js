@@ -8,7 +8,8 @@ var statsService = require('../services/statsService');
 // post a new longUrl
 router.post('/urls', jsonParser, function(req, res) {
     var longUrl = req.body.longUrl;
-    urlService.getShortUrl(longUrl, function(url) {
+    var urlType = req.body.urlType;
+    urlService.getShortUrl(longUrl, urlType, function(url) {
         res.json(url);
     });
 });
@@ -16,6 +17,7 @@ router.post('/urls', jsonParser, function(req, res) {
 // lookup a shortUrl without redirecting
 router.get('/urls/:shortUrl', function(req, res) {
     var shortUrl = req.params.shortUrl;
+    console.log('getting shortUrl: ' + shortUrl);
     urlService.getLongUrl(shortUrl, function(url) {
         res.json(url);
     });

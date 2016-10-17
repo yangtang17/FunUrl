@@ -112,6 +112,7 @@ var getUrlInfo = function(shortUrl, info, callback) {
             }
         } else if (info === 'day') {
             // mongoose $sort does not yield right order!!!
+            // Need two for loops instead of splice like other two
             var newData = [];
             for (i = 0; i <= 24; i++) {
                 timeSlot = new Date(timeLimit + i * 60 * 60 * 1000);

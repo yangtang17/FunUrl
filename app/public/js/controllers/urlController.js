@@ -79,7 +79,7 @@ angular.module('tinyurlApp')
 
         timeOptions.month = {
             unit: 'day',
-            unitStepSize: 5,
+            unitStepSize: 5, // do NOT use 7, causing overlapped labels
             round: 'day',
             tooltipFormat: 'MMM D, YYYY',
             displayFormats: {

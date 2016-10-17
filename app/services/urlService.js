@@ -28,9 +28,28 @@ redisClient.keys('*', function(err, replies) {
 
 // flush all memory in case old records cause mistakes
 redisClient.flushall();
+
+// ============================= emoji resources ==============================
+var emojiDict = [
+    '😀', '😁', '😂', '🤣', '😅', '😆', '😍', '😘', '😎', '😙',
+    '🤗', '🙄', '😪', '🤑', '😜', '😭', '😵', '😡', '😇', '🤡',
+    '😈', '👹', '👻', '💩', '👾', '🤖', '😸', '😹', '😻', '😿',
+    '🙈', '🖖', '👌', '👍', '👎', '🙏', '💅', '👀', '💋', '💘',
+    '❤', '💓', '💔', '💕', '💚', '💢', '💣', '💥', '🐈', '🐴',
+    '🦄', '🐷', '🐭', '🐣', '🐧', '🕊', '🐸', '🐢', '🦎', '🐳',
+    '🐬', '🐙', '🌹', '🌻', '🌵', '🍁', '🍇', '🍈', '🍉', '🍊',
+    '🍋', '🍌', '🍍', '🍎', '🍐', '🍑', '🍒', '🍓', '🥝', '🍅',
+    '🥑', '🍆', '🌽', '🍄', '🌰', '🥞', '🧀', '🍖', '🍔', '🍟',
+    '🍕', '🌮', '🍲', '🍦', '🍩', '🍰', '🍵', '🍹', '🌍', '🛩',
+    '🚀', '🌛', '🌞', '🌬', '🌈', '💧', '🎉', '🎃', '🎗', '🏀',
+    '🏈', '🥋'
+];
+
+
+
 // ======================= Main logic==========================================
 // get shortUrl from given longUrl
-var getShortUrl = function(longUrl, callback) {
+var getShortUrl = function(longUrl, urlType, callback) {
     // handle url without 'http://'
     if (longUrl.indexOf('http') === -1) {
         longUrl = 'http://' + longUrl;
@@ -49,10 +68,11 @@ var getShortUrl = function(longUrl, callback) {
                     redisClient.set(url.shortUrl, url.longUrl);
                     redisClient.set(url.longUrl, url.shortUrl);
                 } else { // not found, generate new shortUrl
-                    generateShortUrl(function(shortUrl) {
+                    generateShortUrl(urlType, function(shortUrl) {
                         url = new UrlModel({
                             shortUrl: shortUrl,
-                            longUrl: longUrl
+                            longUrl: longUrl,
+                            urlType: urlType
                         });
 
                         // save to mongodb
@@ -101,10 +121,21 @@ var getLongUrl = function(shortUrl, callback) {
 //================================== Helpers =================================
 
 // generate a new shortUrl for given longUrl
-var generateShortUrl = function(callback) {
-    UrlModel.count({}, function(err, num) {
-        callback(convertTo62(num));
-    });
+var generateShortUrl = function(urlType, callback) {
+    if (urlType === 'alphaNum') {
+        UrlModel.count({}, function(err, num) {
+            callback(convertTo62(num));
+        });
+    } else if (urlType === 'emoji') {
+        var shortUrl = '';
+        for (var i = 0; i < 6; i++) {
+            var len = emojiDict.length;
+            shortUrl += emojiDict[Math.floor(Math.random() * len)];
+            //TODO: determine if having conflicts in mongoDB
+        }
+        callback(shortUrl);
+    }
+
 };
 
 // convert number from 10-base to 62-base (inverted order) string

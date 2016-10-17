@@ -9,6 +9,12 @@ var path = require('path');
 router.get('*', function(req, res) {
     // remove '/' at the beginning
     var shortUrl = req.originalUrl.slice(1);
+    if (shortUrl === 'favicon.ico') {
+        return;
+    }
+    // decode shortUrl since originalUrl didn't go through utf-8 decoding
+    shortUrl = decodeURIComponent(shortUrl);
+    console.log('getting shortUrl for redirecting: ' + shortUrl);
 
     urlService.getLongUrl(shortUrl, function(url) {
         if (url && url.longUrl) { // can't directly call url.longUrl
