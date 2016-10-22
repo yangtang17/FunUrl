@@ -134,9 +134,17 @@ var generateShortUrl = function(urlType, callback) {
         for (var i = 0; i < 6; i++) {
             var len = emojiDict.length;
             shortUrl += emojiDict[Math.floor(Math.random() * len)];
-            //TODO: determine if having conflicts in mongoDB
         }
-        callback(shortUrl);
+
+        //determine if having conflicts in mongoDB
+        UrlModel.findOne({ shortUrl: shortUrl }, function(err, url) {
+            if (url) { // have conflicts, re-generate
+                generateShortUrl(urlType, callback);
+            } else { // no conflicts, callback
+                console.log('no conflict, shortUrl ' + shortUrl + ' successfully created!');
+                callback(shortUrl)
+            }
+        });
     }
 
 };
