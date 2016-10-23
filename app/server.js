@@ -1,10 +1,13 @@
 var express = require('express');
 var app = express();
+var socketio = require('socket.io');
 var restRouter = require('./routes/rest');
-var redirectRouter = require('./routes/redirect');
+var RedirectRouter = require('./routes/redirect');
 var indexRouter = require('./routes/index');
 var mongoose = require('mongoose');
 var useragent = require('express-useragent');
+// app.listen(3000) returns an http.Server object listening to port 3000
+var io = socketio(app.listen(3000));
 
 mongoose.connect('mongodb://user:user@ds051523.mlab.com:51523/xsurl');
 
@@ -19,6 +22,8 @@ app.use("/api/v1", restRouter);
 
 app.use("/", indexRouter);
 
-app.use("/:shortUrl", redirectRouter);
+app.use("/:shortUrl", (new RedirectRouter(io)).router);
 
-app.listen(3000);
+io.on('connection', function(socket) {
+    console.log('socket connected: ' + socket);
+});
