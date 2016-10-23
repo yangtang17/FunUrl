@@ -1,17 +1,25 @@
 angular.module('tinyurlApp')
-    .controller('urlController', ['$scope', '$http', '$routeParams', function($scope, $http, $routeParams) {
-        console.log('inside urlController');
+    .controller('urlController', ['$scope', '$http', '$routeParams', 'socket', function($scope, $http, $routeParams, socket) {
+        // only need WebSocket connection at url.html page
+
+
+        // render shortUrl and longUrl
         $http.get('/api/v1/urls/' + $routeParams.shortUrl)
             .success(function(data) {
                 $scope.longUrl = data.longUrl;
                 $scope.shortUrl = data.shortUrl;
-                $scope.shortUrlToShow = 'http://localhost:8000/' + data.shortUrl;
+                $scope.shortUrlToShow = 'http://localhost:8080/' + data.shortUrl;
             });
 
-        $http.get('/api/v1/urls/' + $routeParams.shortUrl + '/totalClicks')
-            .success(function(data) {
-                $scope.totalClicks = data;
-            });
+
+        // define render functions for each element
+        var renderTotalClicks = function() {
+            $http.get('/api/v1/urls/' + $routeParams.shortUrl + '/totalClicks')
+                .success(function(data) {
+                    $scope.totalClicks = data;
+                });
+
+        };
 
 
         var renderChart = function(chart, infos) {
@@ -48,11 +56,6 @@ angular.module('tinyurlApp')
                 }]
             }
         };
-
-        renderChart("doughnut", "referer");
-        renderChart("pie", "country");
-        renderChart("base", "platform");
-        renderChart("bar", "browser");
 
         // variables to pass string in getTime(time) from HTML
         $scope.hour = 'hour';
@@ -106,6 +109,7 @@ angular.module('tinyurlApp')
             }
         };
 
+
         $scope.getTime = function(time) {
             $scope.lineLabels = [];
             // ensure lineData is 2D array to display hover effect correctly
@@ -129,6 +133,31 @@ angular.module('tinyurlApp')
                 });
         };
 
-        $scope.getTime($scope.time);
+        var renderTime = function() {
+            $scope.getTime($scope.time);
+        };
+
+
+
+        // render all elements
+        function renderAll() {
+            renderTotalClicks();
+            renderChart("doughnut", "referer");
+            renderChart("pie", "country");
+            renderChart("base", "platform");
+            renderChart("bar", "browser");
+            renderTime();
+        }
+
+        // render all elements at the beginning
+        renderAll();
+
+        // render all when current shortUrl gets visited
+        socket.on('shortUrlVisited', function(visitedShortUrl) {
+            if ($scope.shortUrl === visitedShortUrl) {
+                renderAll();
+            }
+        });
+
 
     }]);
