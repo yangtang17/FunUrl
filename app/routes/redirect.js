@@ -24,7 +24,8 @@ module.exports = function RedirectRouter(io) {
                 io.emit('shortUrlVisited', shortUrl);
 
             } else {
-                // if not found, return index page, let client side handle further // routing
+                // if not found, return index page, let client side handle
+                // further routing
                 res.sendFile("index.html", { root: path.join(__dirname, '../public/views/') });
             }
         });
